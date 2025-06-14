@@ -36,6 +36,10 @@ import rightPatern from '../assets/pattern-blue-white.png'
 import bgPengaduan from '../assets/pengaduanBg.png'
 import building2 from '../assets/building2.png'
 import peopleConstruct from '../assets/peopleConstruct.png'
+import hotel from '../assets/hotel.jpg'
+import hotel2 from '../assets/hotel2.jpg'
+import akuntan from '../assets/akuntan.jpg'
+import pplg from '../assets/pplg.jpg'
 
 
 
@@ -48,5 +52,5 @@ export {
     headerShop, shop1, shop2, shop3, shop4, shop5, shop6, shop7,
     headerPengaduan, manusiaLaptop,
     basarnas, dinsos, dishub, kejaksaan, pertanian, polisi, pupr, bgLogin, rightPatern,
-    bannerShop, allCategori, mkpp, leftPatern, report, building, newspaper, onlineShopping, galery
+    bannerShop, allCategori, mkpp, leftPatern, report, building, newspaper, onlineShopping, galery, hotel, hotel2, akuntan, pplg
 };

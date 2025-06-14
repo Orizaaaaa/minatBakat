@@ -5,9 +5,13 @@ import { IoFolderOpenOutline } from 'react-icons/io5';
 import { PiPaperPlaneRightLight } from "react-icons/pi";
 import { RiRobot2Line } from "react-icons/ri";
 import { FiUserCheck } from "react-icons/fi";
+import { HiOutlineDownload } from "react-icons/hi";
+import Image from 'next/image';
+import { akuntan, hotel, hotel2, pplg } from '../image';
 type Props = {}
 
 const page = (props: Props) => {
+
 
 
     const conditions = (value: string) => {
@@ -27,7 +31,7 @@ const page = (props: Props) => {
 
         } else if (value === 'start') {
             return (
-                <>
+                <div>
                     <div className='mb-5'>
                         <h1>Apakah anda tertarik pada dunia komputer?</h1>
                         <div className="flex mt-2 gap-3 flex-wrap">
@@ -41,10 +45,27 @@ const page = (props: Props) => {
                     <div className="flex justify-end">
                         <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7 flex items-center gap-2' > KIRIM JAWABAN  <PiPaperPlaneRightLight size={20} /></button>
                     </div>
-                </>
+                </div>
             )
         } else if (value === 'end') {
-            console.log('end')
+            return (
+                <div className="relative w-full h-full flex flex-col justify-center items-center ">
+                    <div className='mb-5'>
+                        Berdasarkan jawaban yang anda berikan, anda memiliki ketertarikan dalam jurusan <i>Perhotelan</i>
+                    </div>
+
+                    <div className="my-5">
+                        <Image className='rounded-lg' width={300} height={300} src={hotel2} alt='hasil' />
+                    </div>
+
+                    {/* Tombol fixed di kanan bawah container */}
+                    <button className='absolute bottom-5 right-5 py-2 px-4 rounded-full bg-primary text-white text-sm flex items-center gap-2 shadow-lg'>
+                        <span>DOWNLOAD HASIL</span>
+                        <HiOutlineDownload size={20} />
+                    </button>
+                </div>
+            )
+
         }
     }
 
