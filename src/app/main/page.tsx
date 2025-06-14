@@ -75,22 +75,22 @@ const page = (props: Props) => {
             <div className="flex justify-between">
                 <div className="flex justify-center items-center gap-2">
                     <GrNotes size={30} />
-                    <h1 className=" font-bold text-lg">TES MINAT BAKAT</h1>
+                    <h1 className=" font-bold md:text-lg">TES MINAT BAKAT</h1>
                 </div>
-                <button className='py-2 px-4 rounded-full bg-primary text-white' > TES MINAT GRATIS</button>
+                <button className='py-2 px-4 rounded-full bg-primary text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
             </div>
 
             <hr className=' mb-10 mt-5 text-slate-200' />
 
             <section>
-                <h1 className='text-5xl font-bold' >
+                <h1 className='text-2xl md:text-5xl font-bold' >
                     Lakukan tes minat bakat anda dengan berbagai pilihan pertanyaan
                 </h1>
                 <h2 className='mt-2' >Anda akan lebih tau minat bakat serta kemampuan anda untuk masuk ke sekolah yadika</h2>
                 <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7' > LAKUKAN TES</button>
             </section>
 
-            <div className="px-8 h-screen overflow-y-auto">
+            <div className=" px-2 lg:px-8 h-screen overflow-y-auto">
                 <section className='w-full h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
                     {conditions('pending')}
                 </section>
