@@ -50,13 +50,48 @@ const page = (props: Props) => {
         } else if (value === 'end') {
             return (
                 <div className="relative w-full h-full flex flex-col justify-center items-center ">
-                    <div className='mb-5'>
-                        Berdasarkan jawaban yang anda berikan, anda memiliki ketertarikan dalam jurusan <i>Perhotelan</i>
+                    <div className="grid grid-cols-2 items-center justify-center">
+                        <div className="my-5">
+                            <Image className='rounded-lg' width={300} height={300} src={hotel2} alt='hasil' />
+                        </div>
+                        <div className='mb-5'>
+                            <div className="mb-5">
+                                Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang kuat dalam jurusan <i>Perhotelan</i>.
+                            </div>
+                            <div className="mb-5">
+                                Kamu adalah pribadi yang ramah, sabar, dan memiliki kemampuan komunikasi yang baik. Kamu senang berada di lingkungan sosial, menyukai interaksi dengan orang baru, dan merasa puas ketika bisa membantu atau melayani orang lain. Kamu juga memiliki perhatian terhadap detail, bersikap sopan, dan mampu menjaga sikap profesional dalam berbagai situasi. Ketertarikan kamu terlihat pada bagaimana kamu menikmati bekerja secara tim, menyukai suasana kerja yang dinamis, dan mampu menjaga penampilan serta etika kerja.
+                            </div>
+                            <div className="mb-5">
+                                <b>Prospek ke depan:</b> Lulusan perhotelan memiliki peluang besar untuk bekerja di hotel berbintang, kapal pesiar, restoran, maskapai penerbangan, dan berbagai bidang hospitality lainnya. Kamu juga bisa melanjutkan ke bidang manajemen perhotelan, pariwisata, atau membuka bisnis sendiri di sektor jasa pelayanan.
+                            </div>
+                        </div>
+
+                        {/* PPLG
+                        <div className="mb-5">
+                            Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang tinggi dalam jurusan <i>Pengembangan Perangkat Lunak dan Gim (PPLG)</i>.
+                        </div>
+                        <div className="mb-5">
+                            Kamu senang bekerja dengan komputer, suka mencoba aplikasi baru, dan sering penasaran bagaimana suatu program bisa bekerja. Kamu memiliki pemikiran logis dan kreatif, serta menikmati tantangan dalam memecahkan masalah secara teknis. Kamu juga tertarik pada dunia digital, senang membuat sesuatu dari ide menjadi kenyataan, terutama dalam bentuk aplikasi, website, atau permainan. Ketertarikanmu mencerminkan minat yang besar dalam teknologi, inovasi, serta kemampuan untuk bekerja mandiri maupun dalam tim pengembang.
+                        </div>
+                        <div className="mb-5">
+                            <b>Prospek ke depan:</b> Dengan perkembangan teknologi yang sangat cepat, lulusan PPLG sangat dibutuhkan. Kamu bisa menjadi programmer, game developer, mobile app developer, UI/UX designer, hingga CTO di startup. Kamu juga bisa bekerja remote untuk perusahaan luar negeri atau membangun software dan bisnis digital sendiri.
+                        </div>
+
+                        AKUNTASI
+                        <div className="mb-5">
+                            Berdasarkan jawaban yang Anda berikan, Anda menunjukkan ketertarikan yang mendalam dalam jurusan <i>Akuntansi</i>.
+                        </div>
+                        <div className="mb-5">
+                            Kamu adalah pribadi yang sistematis, teliti, dan bertanggung jawab. Kamu menikmati aktivitas yang berkaitan dengan angka, perhitungan, serta pencatatan keuangan. Kamu cenderung analitis dan suka membuat segala sesuatu terorganisir dengan rapi. Ketertarikanmu terlihat dari kesukaanmu terhadap aktivitas yang membutuhkan konsistensi dan akurasi tinggi, serta kemampuanmu dalam menyusun laporan dan melihat pola dalam data. Kamu juga senang memahami bagaimana uang mengalir dan bagaimana suatu organisasi bisa dikelola secara finansial.
+                        </div>
+                        <div className="mb-5">
+                            <b>Prospek ke depan:</b> Lulusan akuntansi dibutuhkan di hampir setiap jenis organisasi — baik perusahaan, lembaga pemerintah, maupun institusi nirlaba. Kamu bisa menjadi akuntan publik, auditor, analis keuangan, atau konsultan pajak. Profesi ini juga menjadi pondasi yang kuat bila kamu ingin berkarier sebagai manajer keuangan atau pengusaha.
+                        </div> */}
+
+
+
                     </div>
 
-                    <div className="my-5">
-                        <Image className='rounded-lg' width={300} height={300} src={hotel2} alt='hasil' />
-                    </div>
 
                     {/* Tombol fixed di kanan bawah container */}
                     <button className='absolute bottom-5 right-5 py-2 px-4 rounded-full bg-primary text-white text-sm flex items-center gap-2 shadow-lg'>
@@ -92,7 +127,7 @@ const page = (props: Props) => {
 
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto">
                 <section className='w-full h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
-                    {conditions('pending')}
+                    {conditions('end')}
                 </section>
 
 
