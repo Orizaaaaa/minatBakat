@@ -9,6 +9,7 @@ import { FiUserCheck } from "react-icons/fi";
 import { HiOutlineDownload } from "react-icons/hi";
 import Image from 'next/image';
 import { akuntan, hotel, hotel2, pplg } from '../image';
+import { uploadModel } from '@/api/model';
 type Props = {}
 
 const questions: string[] = [
@@ -69,6 +70,8 @@ const page = (props: Props) => {
     const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0))
     const [selectedValue, setSelectedValue] = useState<number | null>(null)
     const [showTransition, setShowTransition] = useState(true)
+    const [result, setResult] = useState<any>(null)
+    const [conditionValue, setConditionValue] = useState<string>('pending')
 
     const handleAnswer = () => {
         if (selectedValue === null) return
@@ -85,26 +88,101 @@ const page = (props: Props) => {
                 setShowTransition(true)
             }, 300)
         } else {
-            console.log('Jawaban lengkap:', updatedAnswers)
-            alert('✅ Semua pertanyaan selesai!')
+            const data = {
+                "answers": answers
+            }
+            uploadModel(data, (result: any) => {
+                console.log(result);
+                setResult(result)
+            })
         }
+    }
+
+    const handleModel = () => {
+        const data = {
+            "answers": answers
+        }
+        uploadModel(data, (item: any) => {
+            setResult(item)
+        })
     }
 
     console.log(answers);
 
 
+    const resultPrediction = (item: string) => {
+        if (item === 'PPLG') {
+            return (
+                <>
+                    <div className="mb-5">
+                        Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang tinggi dalam jurusan <i>Pengembangan Perangkat Lunak dan Gim (PPLG)</i>.
+                    </div>
+                    <div className="mb-5">
+                        Kamu senang bekerja dengan komputer, suka mencoba aplikasi baru, dan sering penasaran bagaimana suatu program bisa bekerja. Kamu memiliki pemikiran logis dan kreatif, serta menikmati tantangan dalam memecahkan masalah secara teknis. Kamu juga tertarik pada dunia digital, senang membuat sesuatu dari ide menjadi kenyataan, terutama dalam bentuk aplikasi, website, atau permainan. Ketertarikanmu mencerminkan minat yang besar dalam teknologi, inovasi, serta kemampuan untuk bekerja mandiri maupun dalam tim pengembang.
+                    </div>
+                    <div className="mb-5">
+                        <b>Prospek ke depan:</b> Dengan perkembangan teknologi yang sangat cepat, lulusan PPLG sangat dibutuhkan. Kamu bisa menjadi programmer, game developer, mobile app developer, UI/UX designer, hingga CTO di startup. Kamu juga bisa bekerja remote untuk perusahaan luar negeri atau membangun software dan bisnis digital sendiri.
+                    </div>
+                </>
+            )
+        } else if (item === 'Perhotelan') {
+            return (
+                <div className='mb-5'>
+                    <div className="mb-5">
+                        Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang kuat dalam jurusan <i>Perhotelan</i>.
+                    </div>
+                    <div className="mb-5">
+                        Kamu adalah pribadi yang ramah, sabar, dan memiliki kemampuan komunikasi yang baik. Kamu senang berada di lingkungan sosial, menyukai interaksi dengan orang baru, dan merasa puas ketika bisa membantu atau melayani orang lain. Kamu juga memiliki perhatian terhadap detail, bersikap sopan, dan mampu menjaga sikap profesional dalam berbagai situasi. Ketertarikan kamu terlihat pada bagaimana kamu menikmati bekerja secara tim, menyukai suasana kerja yang dinamis, dan mampu menjaga penampilan serta etika kerja.
+                    </div>
+                    <div className="mb-5">
+                        <b>Prospek ke depan:</b> Lulusan perhotelan memiliki peluang besar untuk bekerja di hotel berbintang, kapal pesiar, restoran, maskapai penerbangan, dan berbagai bidang hospitality lainnya. Kamu juga bisa melanjutkan ke bidang manajemen perhotelan, pariwisata, atau membuka bisnis sendiri di sektor jasa pelayanan.
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <>
+                    <div className="mb-5">
+                        Berdasarkan jawaban yang Anda berikan, Anda menunjukkan ketertarikan yang mendalam dalam jurusan <i>Akuntansi</i>.
+                    </div>
+                    <div className="mb-5">
+                        Kamu adalah pribadi yang sistematis, teliti, dan bertanggung jawab. Kamu menikmati aktivitas yang berkaitan dengan angka, perhitungan, serta pencatatan keuangan. Kamu cenderung analitis dan suka membuat segala sesuatu terorganisir dengan rapi. Ketertarikanmu terlihat dari kesukaanmu terhadap aktivitas yang membutuhkan konsistensi dan akurasi tinggi, serta kemampuanmu dalam menyusun laporan dan melihat pola dalam data. Kamu juga senang memahami bagaimana uang mengalir dan bagaimana suatu organisasi bisa dikelola secara finansial.
+                    </div>
+                    <div className="mb-5">
+                        <b>Prospek ke depan:</b> Lulusan akuntansi dibutuhkan di hampir setiap jenis organisasi — baik perusahaan, lembaga pemerintah, maupun institusi nirlaba. Kamu bisa menjadi akuntan publik, auditor, analis keuangan, atau konsultan pajak. Profesi ini juga menjadi pondasi yang kuat bila kamu ingin berkarier sebagai manajer keuangan atau pengusaha.
+                    </div>
+                </>
+            )
+        }
+    }
+
     const conditions = (value: string) => {
         if (value === 'pending') {
             return (
-                <div className=" h-[50vh]  flex justify-center items-center">
-                    <div className="flex justify-center items-center gap-2 bg-red-200 p-4 rounded">
-                        <IoFolderOpenOutline size={25} />
-                        <IoIosArrowForward size={25} />
-                        <RiRobot2Line size={25} />
-                        <IoIosArrowForward size={25} />
-                        <FiUserCheck size={25} />
+                <div className="h-[70vh] flex flex-col justify-between p-4">
+
+                    {/* Tengah */}
+                    <div className="flex justify-center items-center flex-1">
+                        <div className="flex justify-center items-center gap-2 bg-red-200 p-4 rounded">
+                            <IoFolderOpenOutline size={25} />
+                            <IoIosArrowForward size={25} />
+                            <RiRobot2Line size={25} />
+                            <IoIosArrowForward size={25} />
+                            <FiUserCheck size={25} />
+                        </div>
+                    </div>
+
+                    {/* Bawah kanan */}
+                    <div className="flex justify-end">
+                        <button
+                            onClick={() => setConditionValue('start')}
+                            className="py-2 px-4 rounded-full bg-black  text-white text-sm flex items-center gap-2"
+                        >
+                            MULAI
+                        </button>
                     </div>
                 </div>
+
 
             )
 
@@ -121,10 +199,10 @@ const page = (props: Props) => {
                                         key={opt.value}
                                         onClick={() => setSelectedValue(opt.value)}
                                         className={`px-4 py-2 rounded-xl border transition-colors duration-200
-                  ${selectedValue === opt.value
+                                            ${selectedValue === opt.value
                                                 ? 'bg-blue-600 text-white border-blue-600'
                                                 : 'bg-slate-200 hover:bg-slate-300 text-black'}
-                `}
+                                            `}
                                     >
                                         {opt.label}
                                     </button>
@@ -134,8 +212,7 @@ const page = (props: Props) => {
                         <div className="flex justify-end">
                             <button
                                 onClick={handleAnswer}
-                                className="py-2 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm mt-7 flex items-center gap-2"
-                                disabled={selectedValue === null}
+                                className="py-2 px-4 rounded-full bg-black  text-white text-sm mt-7 flex items-center gap-2"
                             >
                                 KIRIM JAWABAN <PiPaperPlaneRightLight size={20} />
                             </button>
@@ -147,45 +224,7 @@ const page = (props: Props) => {
             return (
                 <div className="relative w-full h-full flex flex-col justify-center items-center ">
                     <div className="grid grid-cols-2 items-center justify-center">
-                        <div className="my-5">
-                            <Image className='rounded-lg' width={300} height={300} src={hotel2} alt='hasil' />
-                        </div>
-                        <div className='mb-5'>
-                            <div className="mb-5">
-                                Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang kuat dalam jurusan <i>Perhotelan</i>.
-                            </div>
-                            <div className="mb-5">
-                                Kamu adalah pribadi yang ramah, sabar, dan memiliki kemampuan komunikasi yang baik. Kamu senang berada di lingkungan sosial, menyukai interaksi dengan orang baru, dan merasa puas ketika bisa membantu atau melayani orang lain. Kamu juga memiliki perhatian terhadap detail, bersikap sopan, dan mampu menjaga sikap profesional dalam berbagai situasi. Ketertarikan kamu terlihat pada bagaimana kamu menikmati bekerja secara tim, menyukai suasana kerja yang dinamis, dan mampu menjaga penampilan serta etika kerja.
-                            </div>
-                            <div className="mb-5">
-                                <b>Prospek ke depan:</b> Lulusan perhotelan memiliki peluang besar untuk bekerja di hotel berbintang, kapal pesiar, restoran, maskapai penerbangan, dan berbagai bidang hospitality lainnya. Kamu juga bisa melanjutkan ke bidang manajemen perhotelan, pariwisata, atau membuka bisnis sendiri di sektor jasa pelayanan.
-                            </div>
-                        </div>
-
-                        {/* PPLG
-                        <div className="mb-5">
-                            Berdasarkan jawaban yang Anda berikan, Anda memiliki ketertarikan yang tinggi dalam jurusan <i>Pengembangan Perangkat Lunak dan Gim (PPLG)</i>.
-                        </div>
-                        <div className="mb-5">
-                            Kamu senang bekerja dengan komputer, suka mencoba aplikasi baru, dan sering penasaran bagaimana suatu program bisa bekerja. Kamu memiliki pemikiran logis dan kreatif, serta menikmati tantangan dalam memecahkan masalah secara teknis. Kamu juga tertarik pada dunia digital, senang membuat sesuatu dari ide menjadi kenyataan, terutama dalam bentuk aplikasi, website, atau permainan. Ketertarikanmu mencerminkan minat yang besar dalam teknologi, inovasi, serta kemampuan untuk bekerja mandiri maupun dalam tim pengembang.
-                        </div>
-                        <div className="mb-5">
-                            <b>Prospek ke depan:</b> Dengan perkembangan teknologi yang sangat cepat, lulusan PPLG sangat dibutuhkan. Kamu bisa menjadi programmer, game developer, mobile app developer, UI/UX designer, hingga CTO di startup. Kamu juga bisa bekerja remote untuk perusahaan luar negeri atau membangun software dan bisnis digital sendiri.
-                        </div>
-
-                        AKUNTASI
-                        <div className="mb-5">
-                            Berdasarkan jawaban yang Anda berikan, Anda menunjukkan ketertarikan yang mendalam dalam jurusan <i>Akuntansi</i>.
-                        </div>
-                        <div className="mb-5">
-                            Kamu adalah pribadi yang sistematis, teliti, dan bertanggung jawab. Kamu menikmati aktivitas yang berkaitan dengan angka, perhitungan, serta pencatatan keuangan. Kamu cenderung analitis dan suka membuat segala sesuatu terorganisir dengan rapi. Ketertarikanmu terlihat dari kesukaanmu terhadap aktivitas yang membutuhkan konsistensi dan akurasi tinggi, serta kemampuanmu dalam menyusun laporan dan melihat pola dalam data. Kamu juga senang memahami bagaimana uang mengalir dan bagaimana suatu organisasi bisa dikelola secara finansial.
-                        </div>
-                        <div className="mb-5">
-                            <b>Prospek ke depan:</b> Lulusan akuntansi dibutuhkan di hampir setiap jenis organisasi — baik perusahaan, lembaga pemerintah, maupun institusi nirlaba. Kamu bisa menjadi akuntan publik, auditor, analis keuangan, atau konsultan pajak. Profesi ini juga menjadi pondasi yang kuat bila kamu ingin berkarier sebagai manajer keuangan atau pengusaha.
-                        </div> */}
-
-
-
+                        {resultPrediction(result)}
                     </div>
 
 
@@ -223,13 +262,11 @@ const page = (props: Props) => {
 
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto">
                 <section className='w-full h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
-                    {conditions('start')}
+                    {conditions(conditionValue)}
                 </section>
-
-
             </div>
 
-
+            <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7' onClick={handleModel} >button handle</button>
         </section>
 
     )

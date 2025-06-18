@@ -1,8 +1,10 @@
-import LandingUi from "@/components/ui/LandingUi"
+import React from 'react'
 
-const page = () => {
+type Props = {}
+
+const page = (props: Props) => {
   return (
-    <LandingUi />
+    <div>hallo</div>
   )
 }
 
