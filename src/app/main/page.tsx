@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { GrNotes } from 'react-icons/gr'
 import { IoIosArrowForward } from 'react-icons/io';
 import { IoFolderOpenOutline } from 'react-icons/io5';
@@ -112,6 +112,15 @@ const page = (props: Props) => {
     }
 
     console.log(answers);
+
+    const tesSectionRef = useRef<HTMLDivElement>(null)
+
+    const startTes = () => {
+        setConditionValue('start')
+        setTimeout(() => {
+            tesSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 100) // Delay kecil untuk memastikan komponen sudah render
+    }
 
 
     const prediction = (item: string) => {
@@ -269,7 +278,7 @@ const page = (props: Props) => {
                 <div className="flex justify-center items-center gap-2">
                     <Image src={logo} alt="logo" width={170} height={170} />
                 </div>
-                <button className='py-2 px-4 rounded-full bg-primary text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
+                <button onClick={startTes} className='py-2 px-4 rounded-full bg-primary text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
             </div>
 
             <hr className=' mb-10 mt-5 text-slate-200' />
@@ -282,7 +291,7 @@ const page = (props: Props) => {
                 <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7' > LAKUKAN TES</button>
             </section>
 
-            <div className=" px-2 lg:px-8 h-screen overflow-y-auto">
+            <div className=" px-2 lg:px-8 h-screen overflow-y-auto" ref={tesSectionRef}>
                 <section className='w-full h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
                     {conditions(conditionValue)}
                 </section>
