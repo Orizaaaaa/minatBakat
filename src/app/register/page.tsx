@@ -167,7 +167,7 @@ const Register = () => {
                     </ButtonPrimary>
 
                     <p className='text-sm'>
-                        Sudah punya akun? <Link className='text-primary font-medium' href='/login'>Login</Link>
+                        Sudah punya akun? <Link className='text-primary font-medium' href='/'>Login</Link>
                     </p>
                 </form>
             </div>
