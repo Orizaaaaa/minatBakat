@@ -70,7 +70,7 @@ const page = (props: Props) => {
     const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0))
     const [selectedValue, setSelectedValue] = useState<number | null>(null)
     const [showTransition, setShowTransition] = useState(true)
-    const [conditionValue, setConditionValue] = useState<string>('start')
+    const [conditionValue, setConditionValue] = useState<string>('pending')
     const [resultPrediction, setresultPrediction] = useState<string>('')
 
     const handleAnswer = () => {
