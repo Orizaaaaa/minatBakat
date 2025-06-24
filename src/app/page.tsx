@@ -12,74 +12,104 @@ import { Spinner } from '@nextui-org/react';
 
 import Link from 'next/link';
 import { logo } from './image';
+import { loginUser } from '@/lib/firebase/firestore';
 
 
 const Login = () => {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(true)
-  const [errorLogin, setErrorLogin] = useState('')
-  const [disabled, setDisabled] = useState(true)
-  const [typePassword, setTypePassword] = useState("password")
-  const [loading, setLoading] = useState(false)
-  const [form, setForm] = useState({
+  const [showPassword, setShowPassword] = useState(true);
+  const [errorLogin, setErrorLogin] = useState('');
+  const [typePassword, setTypePassword] = useState("password");
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState({
     email: '',
     password: ''
   })
-
+  const [form, setForm] = useState({
+    email: '',
+    password: ''
+  });
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
-    if (typePassword === "password") {
-      setTypePassword("text");
-    } else {
-      setTypePassword("password");
-    }
-  }
-
+    setTypePassword(showPassword ? "text" : "password");
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, } = e.target;
+    const { name, value } = e.target;
     setForm({ ...form, [name]: value });
 
-    const updatedValues = {
-      ...form,
-      [name]: value,
-    };
-
-    if (updatedValues.email !== "" && updatedValues.password !== "" && (updatedValues.email.includes('@gmail.com') || updatedValues.email.includes('@test.com'))) {
-      setDisabled(false);
-    } else {
-      setDisabled(true);
-    }
-
-  }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
-    setLoading(true)
     e.preventDefault();
-    await loginService(form, (status: boolean, res: any) => {
-      if (status) {
-        const tokenCookies = document.cookie = `token=${res.data.token}`
-        if (tokenCookies) {
+    setLoading(true);
 
-          console.log(res.data);
-          if (typeof window !== 'undefined') {
-            localStorage.setItem('name', res?.data?.username);
-            localStorage.setItem('role', res?.data?.role);
-            localStorage.setItem('token', res?.data?.token);
-          }
-          router.push('/arsip');
-          setLoading(false)
-        }
-      } else {
-        setErrorLogin('*Email atau password salah')
-        console.log(res.data);
-        setLoading(false)
-      }
-    })
+    let isValid = true;
+    let errors = { email: '', password: '' };
+
+    // Validasi email tidak boleh kosong dan harus sesuai format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!form.email) {
+      errors.email = '*Email tidak boleh kosong';
+      isValid = false;
+    } else if (!emailRegex.test(form.email)) {
+      errors.email = '*Email tidak sesuai format';
+      isValid = false;
+    }
+
+    // Validasi password tidak boleh kosong dan harus lebih dari 8 karakter
+    if (!form.password) {
+      errors.password = '*Password tidak boleh kosong';
+      isValid = false;
+    } else if (form.password.length < 8) {
+      errors.password = '*Password harus lebih dari 8 karakter';
+      isValid = false;
+    }
+
+    // Jika tidak valid, set error dan hentikan proses
+    if (!isValid) {
+      setErrorMsg(errors);
+      setLoading(false);
+      return;
+    }
+
+    // Reset error messages
+    setErrorMsg({ email: '', password: '' });
+
+    try {
+      const user = await loginUser(form.email, form.password);
+      console.log(user.accessToken);
+
+      setErrorLogin('');
+      const token = user.accessToken
+      document.cookie = `token=${token}; path=/`;
+      localStorage.setItem('email', user.email || '');
+      localStorage.setItem('token', token);
+
+      // Redirect berdasarkan role (contoh menggunakan role dari localStorage)
+      setLoading(false);
+      router.push('/main');
+      console.log(user);
+
+    } catch (error) {
+      setErrorLogin('*Email atau password salah');
+      console.log(error);
+      setLoading(false);
+    }
   };
 
 
+  // const handleRegister = async () => {
+  //     try {
+  //         const user = await registerUser("smpn@gmail.com", "oasis6666");
+  //         console.log("Registrasi berhasil", user);
+  //         // Lakukan sesuatu setelah registrasi berhasil, misal redirect ke halaman login atau profil
+  //     } catch (error) {
+  //         console.error(error);
+  //         // Tampilkan pesan error ke user
+  //     }
+  // };
 
   return (
     <div className="login">
@@ -95,7 +125,7 @@ const Login = () => {
             <InputForm className='form-input-login' htmlFor="password" onChange={handleChange} type={typePassword} value={form.password} placeholder="Masukkan Kata Sandi" />
           </div>
           <p className='text-red my-3 text-sm' >{errorLogin}</p>
-          <ButtonPrimary typeButon={"submit"} disabled={disabled} className={`rounded-lg w-full mb-3 font-medium py-2 `}>
+          <ButtonPrimary typeButon={"submit"} className={`rounded-lg w-full mb-3 font-medium py-2 `}>
             {loading ? <Spinner className={`w-5 h-5 `} size="sm" color="white" /> : 'Login'}
           </ButtonPrimary>
           <p className='text-sm'>Belum punya akun ? <Link className='text-primary font-medium ' href={'/register'} > Daftar</Link></p>
