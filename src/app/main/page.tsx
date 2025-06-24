@@ -8,7 +8,7 @@ import { RiRobot2Line } from "react-icons/ri";
 import { FiUserCheck } from "react-icons/fi";
 import { HiOutlineDownload } from "react-icons/hi";
 import Image from 'next/image';
-import { akuntan, hotel, hotel2, pplg } from '../image';
+import { akuntan, hotel, hotel2, logo, pplg } from '../image';
 import { uploadModel } from '@/api/model';
 type Props = {}
 
@@ -223,7 +223,7 @@ const page = (props: Props) => {
                                         onClick={() => setSelectedValue(opt.value)}
                                         className={`px-4 py-2 rounded-xl border transition-colors duration-200
                                             ${selectedValue === opt.value
-                                                ? 'bg-blue-600 text-white border-blue-600'
+                                                ? 'bg-black text-white border-blue-600'
                                                 : 'bg-slate-200 hover:bg-slate-300 text-black'}
                                             `}
                                     >
@@ -232,7 +232,7 @@ const page = (props: Props) => {
                                 ))}
                             </div>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end items-end">
                             <button
                                 onClick={handleAnswer}
                                 className="py-2 px-4 rounded-full bg-black  text-white text-sm mt-7 flex items-center gap-2"
@@ -267,8 +267,7 @@ const page = (props: Props) => {
         <section className='container mx-auto mt-9' >
             <div className="flex justify-between">
                 <div className="flex justify-center items-center gap-2">
-                    <GrNotes size={30} />
-                    <h1 className=" font-bold md:text-lg">TES MINAT BAKAT</h1>
+                    <Image src={logo} alt="logo" width={170} height={170} />
                 </div>
                 <button className='py-2 px-4 rounded-full bg-primary text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
             </div>
