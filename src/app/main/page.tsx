@@ -152,7 +152,7 @@ const Page = (props: Props) => {
     const prediction = (item: string) => {
         if (item === 'PPLG') {
             return (
-                <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-4 lg:gap-8 p-4 bg-white rounded-lg shadow-md">
                     <div className="flex justify-center items-center ">
                         <Image className='rounded-lg' src={pplg} alt="PPLG" width={300} height={300} />
                     </div>
@@ -169,11 +169,11 @@ const Page = (props: Props) => {
                         </div>
                     </div>
 
-                </>
+                </div>
             )
         } else if (item === 'Perhotelan') {
             return (
-                <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-4 lg:gap-8 p-4 bg-white rounded-lg shadow-md">
                     <div className="flex justify-center items-center ">
                         <Image className='rounded-lg' src={hotel2} alt="Perhotelan" width={300} height={300} />
                     </div>
@@ -189,11 +189,11 @@ const Page = (props: Props) => {
                             <b>Prospek ke depan:</b> Lulusan perhotelan memiliki peluang besar untuk bekerja di hotel berbintang, kapal pesiar, restoran, maskapai penerbangan, dan berbagai bidang hospitality lainnya. Kamu juga bisa melanjutkan ke bidang manajemen perhotelan, pariwisata, atau membuka bisnis sendiri di sektor jasa pelayanan.
                         </div>
                     </div>
-                </>
+                </div>
             )
         } else { // Akuntansi
             return (
-                <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-4 lg:gap-8 p-4 bg-white rounded-lg shadow-md">
                     <div className="flex justify-center items-center ">
                         <Image className='rounded-lg' src={akuntan} alt="Akuntansi" width={300} height={300} />
                     </div>
@@ -209,7 +209,7 @@ const Page = (props: Props) => {
                             <b>Prospek ke depan:</b> Lulusan akuntansi dibutuhkan di hampir setiap jenis organisasi — baik perusahaan, lembaga pemerintah, maupun institusi nirlaba. Kamu bisa menjadi akuntan publik, auditor, analis keuangan, atau konsultan pajak. Profesi ini juga menjadi pondasi yang kuat bila kamu ingin berkarier sebagai manajer keuangan atau pengusaha.
                         </div>
                     </div>
-                </>
+                </div>
             )
         }
     }
@@ -344,7 +344,7 @@ const Page = (props: Props) => {
             return (
                 <div className="relative w-full h-full flex flex-col justify-center items-center p-4">
                     {/* Bagian ini akan diubah menjadi gambar untuk PDF */}
-                    <div ref={resultContentRef} className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-4 lg:gap-8 p-4 bg-white rounded-lg shadow-md">
+                    <div ref={resultContentRef} >
                         {prediction(resultPrediction)}
                     </div>
 
@@ -383,7 +383,7 @@ const Page = (props: Props) => {
             </section>
 
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto" ref={tesSectionRef}>
-                <section className='w-full h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
+                <section className='w-full h-fit lg:h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
                     {conditions(conditionValue)}
                 </section>
             </div>
