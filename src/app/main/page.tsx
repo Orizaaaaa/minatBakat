@@ -87,7 +87,7 @@ const Page = (props: Props) => {
     // State untuk mengontrol transisi tampilan pertanyaan
     const [showTransition, setShowTransition] = useState(true)
     // State untuk mengontrol tampilan bagian aplikasi (pending, start, end)
-    const [conditionValue, setConditionValue] = useState<string>('end') // Diubah dari 'end' ke 'pending'
+    const [conditionValue, setConditionValue] = useState<string>('pending') // Diubah dari 'end' ke 'pending'
     // State untuk menyimpan hasil prediksi dari model
     const [resultPrediction, setresultPrediction] = useState<string>('')
     // State untuk menyimpan detail pertanyaan dan jawaban pengguna untuk PDF
@@ -218,10 +218,12 @@ const Page = (props: Props) => {
     const handleDownloadPdf = async () => {
         const doc = new jsPDF('p', 'mm', 'a4'); // Inisialisasi dokumen PDF (potrait, mm, A4)
         let yOffset = 15; // Offset Y awal untuk konten
+        const margin = 10; // Margin kiri dan kanan
+        const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin; // Lebar maksimum untuk teks
 
         // Tambahkan Judul
         doc.setFontSize(15);
-        doc.text('Hasil Tes Minat Bakat', 105, yOffset, { align: 'center', });
+        doc.text('Laporan Hasil Tes Minat Bakat', doc.internal.pageSize.getWidth() / 2, yOffset, { align: 'center' });
         yOffset += 15;
 
         // Tambahkan Hasil Prediksi (diambil dari elemen HTML)
@@ -240,25 +242,35 @@ const Page = (props: Props) => {
 
         // Tambahkan Judul Bagian Pertanyaan dan Jawaban
         doc.setFontSize(10);
-        doc.text('Pertanyaan dan Jawaban Anda', 10, yOffset);
+        doc.text('Pertanyaan dan Jawaban Anda', margin, yOffset);
         yOffset += 10;
 
         // Tambahkan setiap pertanyaan dan jawaban
-        doc.setFontSize(12); // Ukuran font untuk Q&A
+        doc.setFontSize(8); // Ukuran font untuk Q&A
         answerRecords.forEach((record, index) => {
+            // Format pertanyaan dengan nomor
+            const questionText = `${index + 1}. ${record.question}`;
+            // Pecah teks pertanyaan agar sesuai dengan lebar halaman
+            const splitQuestion = doc.splitTextToSize(questionText, maxWidth);
+
+            // Estimasi tinggi yang dibutuhkan untuk pertanyaan dan jawaban ini
+            const questionHeight = splitQuestion.length * doc.getLineHeight() / doc.internal.scaleFactor;
+            const answerHeight = doc.getLineHeight() / doc.internal.scaleFactor; // Untuk 1 baris jawaban
+            const totalRecordHeight = questionHeight + answerHeight + 5; // Tambah spasi
+
             // Periksa apakah perlu halaman baru
-            // Estimasi ruang yang dibutuhkan untuk satu Q&A: sekitar 20mm (pertanyaan + jawaban + spasi)
-            if (yOffset + 20 > doc.internal.pageSize.getHeight() - 10) { // Jika mendekati batas bawah halaman
+            if (yOffset + totalRecordHeight > doc.internal.pageSize.getHeight() - margin) {
                 doc.addPage(); // Tambah halaman baru
-                yOffset = 15; // Reset offset Y untuk halaman baru
+                yOffset = margin; // Reset offset Y untuk halaman baru
             }
 
-            // Tambahkan pertanyaan
-            doc.text(`${index + 1}. ${record.question}`, 10, yOffset);
-            yOffset += 7; // Spasi setelah pertanyaan
+            // Tambahkan pertanyaan yang sudah dipecah
+            doc.text(splitQuestion, margin, yOffset);
+            yOffset += questionHeight; // Pindahkan offset Y setelah pertanyaan
+
             // Tambahkan jawaban
-            doc.text(`   Jawaban Anda: ${record.answerLabel} (${record.answerValue})`, 15, yOffset);
-            yOffset += 10; // Spasi setelah jawaban
+            doc.text(`   Jawaban Anda: ${record.answerLabel} (${record.answerValue})`, margin + 5, yOffset);
+            yOffset += answerHeight + 5; // Spasi setelah jawaban dan untuk record berikutnya
         });
 
         // Simpan dokumen PDF
