@@ -8,10 +8,16 @@ import { RiRobot2Line } from "react-icons/ri";
 import { FiUserCheck } from "react-icons/fi";
 import { HiOutlineDownload } from "react-icons/hi";
 import Image from 'next/image';
-import { akuntan, hotel, hotel2, logo, pplg } from '../image';
-import { uploadModel } from '@/api/model';
+import { akuntan, hotel, hotel2, logo, pplg } from '../image'; // Pastikan path import ini benar
+import { uploadModel } from '@/api/model'; // Pastikan path import ini benar
+
+// Import pustaka untuk PDF
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 type Props = {}
 
+// Definisi pertanyaan
 const questions: string[] = [
     "Bayangkan Anda menjadi tuan rumah sebuah acara. Hal yang paling membuat Anda puas adalah melihat semua tamu tersenyum dan menikmati acara tersebut.",
     "Ketika aplikasi atau game di ponsel Anda tiba-tiba error, reaksi pertama Anda adalah penasaran ingin tahu 'mengapa ini bisa terjadi?'.",
@@ -55,7 +61,7 @@ const questions: string[] = [
     "Anda percaya bahwa memberikan pelayanan terbaik dan pengalaman yang tak terlupakan adalah bentuk keahlian yang berharga."
 ];
 
-
+// Definisi opsi jawaban
 const options = [
     { label: 'Sangat setuju', value: 5 },
     { label: 'Setuju', value: 4 },
@@ -64,65 +70,85 @@ const options = [
     { label: 'Sangat tidak setuju', value: 1 },
 ]
 
-const page = (props: Props) => {
+// Interface untuk menyimpan detail jawaban
+interface AnswerRecord {
+    question: string;
+    answerValue: number;
+    answerLabel: string;
+}
 
+const Page = (props: Props) => {
+    // State untuk melacak indeks pertanyaan saat ini
     const [currentIndex, setCurrentIndex] = useState(0)
+    // State untuk menyimpan nilai jawaban (angka 1-5) yang akan dikirim ke model
     const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(0))
+    // State untuk menyimpan nilai opsi yang dipilih pengguna untuk pertanyaan saat ini
     const [selectedValue, setSelectedValue] = useState<number | null>(null)
+    // State untuk mengontrol transisi tampilan pertanyaan
     const [showTransition, setShowTransition] = useState(true)
-    const [conditionValue, setConditionValue] = useState<string>('pending')
+    // State untuk mengontrol tampilan bagian aplikasi (pending, start, end)
+    const [conditionValue, setConditionValue] = useState<string>('end') // Diubah dari 'end' ke 'pending'
+    // State untuk menyimpan hasil prediksi dari model
     const [resultPrediction, setresultPrediction] = useState<string>('')
+    // State untuk menyimpan detail pertanyaan dan jawaban pengguna untuk PDF
+    const [answerRecords, setAnswerRecords] = useState<AnswerRecord[]>([]);
 
+    // Ref untuk menggulir ke bagian tes
+    const tesSectionRef = useRef<HTMLDivElement>(null)
+    // Ref untuk bagian hasil prediksi yang akan diubah menjadi gambar untuk PDF
+    const resultContentRef = useRef<HTMLDivElement>(null);
+
+    // Fungsi untuk menangani jawaban pengguna
     const handleAnswer = () => {
-        if (selectedValue === null) return
+        if (selectedValue === null) return // Jangan lanjutkan jika belum ada jawaban dipilih
 
         const updatedAnswers = [...answers]
         updatedAnswers[currentIndex] = selectedValue
         setAnswers(updatedAnswers)
 
+        // Simpan detail pertanyaan dan jawaban untuk PDF
+        const currentQuestion = questions[currentIndex];
+        const selectedOptionLabel = options.find(opt => opt.value === selectedValue)?.label || '';
+        setAnswerRecords(prevRecords => [
+            ...prevRecords,
+            {
+                question: currentQuestion,
+                answerValue: selectedValue,
+                answerLabel: selectedOptionLabel,
+            }
+        ]);
+
+
+        // Lanjutkan ke pertanyaan berikutnya atau kirim data jika sudah selesai
         if (currentIndex < questions.length - 1) {
-            setShowTransition(false)
+            setShowTransition(false) // Mulai transisi fade-out
             setTimeout(() => {
-                setCurrentIndex(currentIndex + 1)
-                setSelectedValue(null)
-                setShowTransition(true)
+                setCurrentIndex(currentIndex + 1) // Pindah ke pertanyaan berikutnya
+                setSelectedValue(null) // Reset pilihan
+                setShowTransition(true) // Mulai transisi fade-in
             }, 300)
         } else {
+            // Jika semua pertanyaan sudah dijawab, kirim data ke model
             const data = {
-                "answers": answers
+                "answers": updatedAnswers // Gunakan updatedAnswers yang sudah final
             }
             uploadModel(data, (result: any) => {
                 console.log(result);
-                setConditionValue('end')
-                setresultPrediction(result.predicted_major)
-
+                setConditionValue('end') // Tampilkan bagian hasil
+                setresultPrediction(result.predicted_major) // Set hasil prediksi
             })
         }
     }
 
-    const handleModel = () => {
-        const data = {
-            "answers": answers
-        }
-        uploadModel(data, (item: any) => {
-
-            setConditionValue('end')
-            setresultPrediction(item)
-        })
-    }
-
-    console.log(answers);
-
-    const tesSectionRef = useRef<HTMLDivElement>(null)
-
+    // Fungsi untuk memulai tes
     const startTes = () => {
-        setConditionValue('start')
+        setConditionValue('start') // Ubah kondisi ke 'start' untuk menampilkan pertanyaan
         setTimeout(() => {
-            tesSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+            tesSectionRef.current?.scrollIntoView({ behavior: 'smooth' }) // Gulir ke bagian tes
         }, 100) // Delay kecil untuk memastikan komponen sudah render
     }
 
-
+    // Fungsi untuk menghasilkan tampilan prediksi berdasarkan hasil model
     const prediction = (item: string) => {
         if (item === 'PPLG') {
             return (
@@ -149,7 +175,7 @@ const page = (props: Props) => {
             return (
                 <>
                     <div className="flex justify-center items-center ">
-                        <Image className='rounded-lg' src={hotel2} alt="PPLG" width={300} height={300} />
+                        <Image className='rounded-lg' src={hotel2} alt="Perhotelan" width={300} height={300} />
                     </div>
 
                     <div className='mb-5'>
@@ -165,11 +191,11 @@ const page = (props: Props) => {
                     </div>
                 </>
             )
-        } else {
+        } else { // Akuntansi
             return (
                 <>
                     <div className="flex justify-center items-center ">
-                        <Image className='rounded-lg' src={akuntan} alt="PPLG" width={300} height={300} />
+                        <Image className='rounded-lg' src={akuntan} alt="Akuntansi" width={300} height={300} />
                     </div>
 
                     <div >
@@ -188,11 +214,63 @@ const page = (props: Props) => {
         }
     }
 
+    // Fungsi untuk mengunduh hasil ke PDF
+    const handleDownloadPdf = async () => {
+        const doc = new jsPDF('p', 'mm', 'a4'); // Inisialisasi dokumen PDF (potrait, mm, A4)
+        let yOffset = 15; // Offset Y awal untuk konten
+
+        // Tambahkan Judul
+        doc.setFontSize(15);
+        doc.text('Hasil Tes Minat Bakat', 105, yOffset, { align: 'center', });
+        yOffset += 15;
+
+        // Tambahkan Hasil Prediksi (diambil dari elemen HTML)
+        if (resultContentRef.current) {
+            // Render elemen HTML ke canvas
+            const canvas = await html2canvas(resultContentRef.current, { scale: 2 }); // Skala 2 untuk kualitas lebih baik
+            const imgData = canvas.toDataURL('image/png'); // Dapatkan data gambar base64
+            const imgWidth = 180; // Lebar gambar di PDF (mm)
+            const imgHeight = (canvas.height * imgWidth) / canvas.width; // Hitung tinggi proporsional
+
+            // Pusatkan gambar di halaman
+            const imgX = (doc.internal.pageSize.getWidth() - imgWidth) / 2;
+            doc.addImage(imgData, 'PNG', imgX, yOffset, imgWidth, imgHeight);
+            yOffset += imgHeight + 10; // Tambahkan offset setelah gambar
+        }
+
+        // Tambahkan Judul Bagian Pertanyaan dan Jawaban
+        doc.setFontSize(10);
+        doc.text('Pertanyaan dan Jawaban Anda', 10, yOffset);
+        yOffset += 10;
+
+        // Tambahkan setiap pertanyaan dan jawaban
+        doc.setFontSize(12); // Ukuran font untuk Q&A
+        answerRecords.forEach((record, index) => {
+            // Periksa apakah perlu halaman baru
+            // Estimasi ruang yang dibutuhkan untuk satu Q&A: sekitar 20mm (pertanyaan + jawaban + spasi)
+            if (yOffset + 20 > doc.internal.pageSize.getHeight() - 10) { // Jika mendekati batas bawah halaman
+                doc.addPage(); // Tambah halaman baru
+                yOffset = 15; // Reset offset Y untuk halaman baru
+            }
+
+            // Tambahkan pertanyaan
+            doc.text(`${index + 1}. ${record.question}`, 10, yOffset);
+            yOffset += 7; // Spasi setelah pertanyaan
+            // Tambahkan jawaban
+            doc.text(`   Jawaban Anda: ${record.answerLabel} (${record.answerValue})`, 15, yOffset);
+            yOffset += 10; // Spasi setelah jawaban
+        });
+
+        // Simpan dokumen PDF
+        doc.save('hasil_tes_minat_bakat.pdf');
+    };
+
+
+    // Fungsi untuk mengontrol tampilan berdasarkan kondisi
     const conditions = (value: string) => {
         if (value === 'pending') {
             return (
                 <div className="h-[70vh] flex flex-col justify-between p-4">
-
                     {/* Tengah */}
                     <div className="flex justify-center items-center flex-1">
                         <div className="flex justify-center items-center gap-2 bg-red-200 p-4 rounded">
@@ -207,15 +285,13 @@ const page = (props: Props) => {
                     {/* Bawah kanan */}
                     <div className="flex justify-end">
                         <button
-                            onClick={() => setConditionValue('start')}
-                            className="py-2 px-4 rounded-full bg-black  text-white text-sm flex items-center gap-2"
+                            onClick={startTes}
+                            className="py-2 px-4 rounded-full bg-black text-white text-sm flex items-center gap-2"
                         >
                             MULAI
                         </button>
                     </div>
                 </div>
-
-
             )
 
         } else if (value === 'start') {
@@ -244,7 +320,7 @@ const page = (props: Props) => {
                         <div className="flex justify-end items-end">
                             <button
                                 onClick={handleAnswer}
-                                className="py-2 px-4 rounded-full bg-black  text-white text-sm mt-7 flex items-center gap-2"
+                                className="py-2 px-4 rounded-full bg-black text-white text-sm mt-7 flex items-center gap-2"
                             >
                                 KIRIM JAWABAN <PiPaperPlaneRightLight size={20} />
                             </button>
@@ -254,15 +330,18 @@ const page = (props: Props) => {
             )
         } else if (value === 'end') {
             return (
-                <div className="relative w-full h-full flex flex-col justify-center items-center ">
-                    <div className="grid grid-cols-2 items-center justify-center">
+                <div className="relative w-full h-full flex flex-col justify-center items-center p-4">
+                    {/* Bagian ini akan diubah menjadi gambar untuk PDF */}
+                    <div ref={resultContentRef} className="grid grid-cols-1 lg:grid-cols-2 items-center justify-center gap-4 lg:gap-8 p-4 bg-white rounded-lg shadow-md">
                         {prediction(resultPrediction)}
                     </div>
 
-
                     {/* Tombol fixed di kanan bawah container */}
-                    <button className='absolute bottom-5 right-5 py-2 px-4 rounded-full bg-primary text-white text-sm flex items-center gap-2 shadow-lg'>
-                        <span>DOWNLOAD HASIL</span>
+                    <button
+                        onClick={handleDownloadPdf}
+                        className='absolute bottom-5 right-5 py-2 px-4 rounded-full bg-black text-white text-sm flex items-center gap-2 shadow-lg'
+                    >
+                        <span>UNDUH HASIL</span>
                         <HiOutlineDownload size={20} />
                     </button>
                 </div>
@@ -278,7 +357,7 @@ const page = (props: Props) => {
                 <div className="flex justify-center items-center gap-2">
                     <Image src={logo} alt="logo" width={170} height={170} />
                 </div>
-                <button onClick={startTes} className='py-2 px-4 rounded-full bg-primary text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
+                <button onClick={startTes} className='py-2 px-4 rounded-full bg-black text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
             </div>
 
             <hr className=' mb-10 mt-5 text-slate-200' />
@@ -287,8 +366,8 @@ const page = (props: Props) => {
                 <h1 className='text-2xl md:text-5xl font-bold' >
                     Lakukan tes minat bakat anda dengan berbagai pilihan pertanyaan
                 </h1>
-                <h2 className='mt-2' >Anda akan lebih tau minat bakat serta kemampuan anda untuk masuk ke sekolah yadika</h2>
-                <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7' > LAKUKAN TES</button>
+                <h2 className='mt-2' >Anda akan lebih tahu minat bakat serta kemampuan anda untuk masuk ke sekolah yadika</h2>
+                <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
             </section>
 
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto" ref={tesSectionRef}>
@@ -296,11 +375,9 @@ const page = (props: Props) => {
                     {conditions(conditionValue)}
                 </section>
             </div>
-
-            {/* <button className='py-2 px-4 rounded-full bg-primary text-white text-sm mt-7' onClick={handleModel} >button handle</button> */}
         </section>
 
     )
 }
 
-export default page
+export default Page
