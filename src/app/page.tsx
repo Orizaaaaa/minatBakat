@@ -13,6 +13,8 @@ import { Spinner } from '@nextui-org/react';
 import Link from 'next/link';
 import { logo } from './image';
 import { loginUser } from '@/lib/firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/firebaseConfig';
 
 
 const Login = () => {
@@ -48,7 +50,6 @@ const Login = () => {
     let isValid = true;
     let errors = { email: '', password: '' };
 
-    // Validasi email tidak boleh kosong dan harus sesuai format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email) {
       errors.email = '*Email tidak boleh kosong';
@@ -58,7 +59,6 @@ const Login = () => {
       isValid = false;
     }
 
-    // Validasi password tidak boleh kosong dan harus lebih dari 8 karakter
     if (!form.password) {
       errors.password = '*Password tidak boleh kosong';
       isValid = false;
@@ -67,37 +67,46 @@ const Login = () => {
       isValid = false;
     }
 
-    // Jika tidak valid, set error dan hentikan proses
     if (!isValid) {
       setErrorMsg(errors);
       setLoading(false);
       return;
     }
 
-    // Reset error messages
     setErrorMsg({ email: '', password: '' });
 
     try {
       const user = await loginUser(form.email, form.password);
-      console.log(user.accessToken);
+      const token = user.accessToken;
+      const uid = user.uid;
+
+      // Ambil data user dari Firestore berdasarkan UID
+      const userDocRef = doc(db, "users", uid);
+      const userSnapshot = await getDoc(userDocRef);
+
+      let name = '';
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data();
+        name = userData.name || '';
+      }
+
+      // Simpan ke localStorage
+      document.cookie = `token=${token}; path=/`;
+      localStorage.setItem('token', token);
+      localStorage.setItem('email', user.email || '');
+      localStorage.setItem('id', uid || '');
+      localStorage.setItem('name', name); // ← Simpan nama dari Firestore
 
       setErrorLogin('');
-      const token = user.accessToken
-      document.cookie = `token=${token}; path=/`;
-      localStorage.setItem('email', user.email || '');
-      localStorage.setItem('token', token);
-
-      // Redirect berdasarkan role (contoh menggunakan role dari localStorage)
       setLoading(false);
       router.push('/main');
-      console.log(user);
-
     } catch (error) {
       setErrorLogin('*Email atau password salah');
-      console.log(error);
+      console.error(error);
       setLoading(false);
     }
   };
+
 
 
   // const handleRegister = async () => {

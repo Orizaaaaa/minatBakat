@@ -22,11 +22,13 @@ const Register = () => {
 
     const [form, setForm] = useState({
         nik: '',
+        name: '',
         email: '',
         password: ''
     })
 
     const [errorMsg, setErrorMsg] = useState({
+        name: '',
         nik: '',
         email: '',
         password: ''
@@ -81,6 +83,14 @@ const Register = () => {
             }))
             return
         }
+        if (name === 'name') {
+            setForm(prev => ({ ...prev, [name]: value }))
+            setErrorMsg(prev => ({
+                ...prev,
+                name: value.length < 6 ? '*Password minimal 6 karakter' : ''
+            }))
+            return
+        }
     }
 
 
@@ -99,8 +109,9 @@ const Register = () => {
             setLoading(false)
             return
         }
+
         try {
-            const user = await registerUser(form.email, form.password)
+            const user = await registerUser(form.email, form.password, form.name) // ← kirim name ke sini
             console.log("Registrasi berhasil", user)
             setErrorRegister('')
             router.push('/')
@@ -111,6 +122,8 @@ const Register = () => {
             setLoading(false)
         }
     }
+
+
     console.log(form);
 
     return (
@@ -121,6 +134,14 @@ const Register = () => {
                         <Image src={logo} alt="logo" width={180} height={190} />
                     </div>
 
+                    <InputForm
+                        placeholder='Masukkan Nama'
+                        type='text'
+                        htmlFor='name'
+                        value={form.name}
+                        onChange={handleChange}
+                    />
+                    <p className="text-red text-sm mb-2">{errorMsg.nik}</p>
                     <InputForm
                         placeholder='Masukkan NIK'
                         type='text'

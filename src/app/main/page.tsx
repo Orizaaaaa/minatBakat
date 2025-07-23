@@ -1,5 +1,5 @@
 'use client'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { GrNotes } from 'react-icons/gr'
 import { IoIosArrowForward } from 'react-icons/io';
 import { IoFolderOpenOutline } from 'react-icons/io5';
@@ -140,7 +140,7 @@ const Page = (props: Props) => {
                 const userId = localStorage.getItem('id');
                 if (!userId) return;
 
-                const userDocRef = doc(db, 'answer', userId);
+                const userDocRef = doc(db, 'answers', userId);
                 const userDocSnap = await getDoc(userDocRef);
 
                 let existingAnswers: string[] = [];
@@ -388,6 +388,27 @@ const Page = (props: Props) => {
         }
     }
 
+    const [majors, setMajors] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const userId = localStorage.getItem('id');
+            if (!userId) return;
+
+            const userDocRef = doc(db, 'answers', userId);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const data = userDocSnap.data();
+                setMajors(data.answers || []);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    console.log('hahaha', majors);
+
 
     return (
         <section className='container mx-auto mt-9' >
@@ -408,6 +429,15 @@ const Page = (props: Props) => {
                 <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
             </section>
 
+            <h1 className='text-lg font-semibold mt-10' >Jawaban yang pernah anda pilih</h1>
+
+            <div className="grid grid-cols-6 gap-2">
+                {majors.map((major, index) => (
+                    <button key={index} className="bg-blue-500 text-white px-3 py-2 rounded">
+                        {major}
+                    </button>
+                ))}
+            </div>
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto" ref={tesSectionRef}>
                 <section className='w-full h-fit lg:h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
                     {conditions(conditionValue)}

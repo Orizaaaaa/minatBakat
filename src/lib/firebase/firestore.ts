@@ -17,7 +17,7 @@ export const loginUser = async (email: string, password: string): Promise<any> =
     }
 };
 
-export const registerUser = async (email: string, password: string): Promise<any> => {
+export const registerUser = async (email: string, password: string, name: string): Promise<any> => {
     try {
         // Registrasi user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -27,8 +27,9 @@ export const registerUser = async (email: string, password: string): Promise<any
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             email: user.email,
+            name: name, // ← tambahkan name di sini
             createdAt: serverTimestamp(),
-            role: 'user' // optional: kamu bisa tambahkan default role atau field lainnya
+            role: 'user'
         });
 
         return user;
@@ -37,6 +38,7 @@ export const registerUser = async (email: string, password: string): Promise<any
         throw new Error("Registrasi gagal. Periksa kembali data yang Anda masukkan.");
     }
 };
+
 
 
 
