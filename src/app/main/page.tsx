@@ -304,6 +304,7 @@ const Page = (props: Props) => {
     };
 
 
+
     // Fungsi untuk mengontrol tampilan berdasarkan kondisi
     const conditions = (value: string) => {
         if (value === 'pending') {
@@ -390,22 +391,29 @@ const Page = (props: Props) => {
 
     const [majors, setMajors] = useState<string[]>([]);
 
+    const fetchData = async () => {
+        const userId = localStorage.getItem('id');
+        if (!userId) return;
+
+        const userDocRef = doc(db, 'answers', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+            const data = userDocSnap.data();
+            setMajors(data.answers || []);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            const userId = localStorage.getItem('id');
-            if (!userId) return;
-
-            const userDocRef = doc(db, 'answers', userId);
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (userDocSnap.exists()) {
-                const data = userDocSnap.data();
-                setMajors(data.answers || []);
-            }
-        };
-
         fetchData();
     }, []);
+
+
+    const handleClickRespon = (value: string) => {
+        setresultPrediction(value); // Update prediksi
+        setConditionValue('end');   // Ganti tampilan ke hasil
+    }
+
 
     console.log('hahaha', majors);
 
@@ -429,11 +437,11 @@ const Page = (props: Props) => {
                 <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
             </section>
 
-            <h1 className='text-lg font-semibold mt-10' >Jawaban yang pernah anda pilih</h1>
+            <h1 className='text-lg font-semibold mt-10 mb-3' >Jawaban yang pernah anda test</h1>
 
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid gerid-cols-4 md:grid-cols-8 gap-2">
                 {majors.map((major, index) => (
-                    <button key={index} className="bg-blue-500 text-white px-3 py-2 rounded">
+                    <button key={index} onClick={() => handleClickRespon(major)} className="bg-black text-white px-3 py-2 rounded-xl">
                         {major}
                     </button>
                 ))}
