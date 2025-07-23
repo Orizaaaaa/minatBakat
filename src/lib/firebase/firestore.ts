@@ -1,5 +1,5 @@
 // services/firestore.ts
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, storage } from "./firebaseConfig";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
@@ -19,14 +19,24 @@ export const loginUser = async (email: string, password: string): Promise<any> =
 
 export const registerUser = async (email: string, password: string): Promise<any> => {
     try {
+        // Registrasi user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        return userCredential.user; // Mengembalikan user setelah berhasil registrasi
+        const user = userCredential.user;
+
+        // Simpan data user ke Firestore
+        await setDoc(doc(db, "users", user.uid), {
+            uid: user.uid,
+            email: user.email,
+            createdAt: serverTimestamp(),
+            role: 'user' // optional: kamu bisa tambahkan default role atau field lainnya
+        });
+
+        return user;
     } catch (error) {
         console.error("Registrasi gagal:", error);
         throw new Error("Registrasi gagal. Periksa kembali data yang Anda masukkan.");
     }
 };
-
 
 
 
