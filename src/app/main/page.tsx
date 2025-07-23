@@ -439,7 +439,7 @@ const Page = (props: Props) => {
 
             <h1 className='text-lg font-semibold mt-10 mb-3' >Jawaban yang pernah anda test</h1>
 
-            <div className="grid gerid-cols-4 md:grid-cols-8 gap-2">
+            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
                 {majors.map((major, index) => (
                     <button key={index} onClick={() => handleClickRespon(major)} className="bg-black text-white px-3 py-2 rounded-xl">
                         {major}
