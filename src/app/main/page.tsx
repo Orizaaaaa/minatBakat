@@ -14,6 +14,8 @@ import { uploadModel } from '@/api/model'; // Pastikan path import ini benar
 // Import pustaka untuk PDF
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase/firebaseConfig';
 
 type Props = {}
 
@@ -100,15 +102,15 @@ const Page = (props: Props) => {
 
     // Fungsi untuk menangani jawaban pengguna
     const handleAnswer = () => {
-        if (selectedValue === null) return // Jangan lanjutkan jika belum ada jawaban dipilih
+        if (selectedValue === null) return;
 
-        const updatedAnswers = [...answers]
-        updatedAnswers[currentIndex] = selectedValue
-        setAnswers(updatedAnswers)
+        const updatedAnswers = [...answers];
+        updatedAnswers[currentIndex] = selectedValue;
+        setAnswers(updatedAnswers);
 
-        // Simpan detail pertanyaan dan jawaban untuk PDF
         const currentQuestion = questions[currentIndex];
         const selectedOptionLabel = options.find(opt => opt.value === selectedValue)?.label || '';
+
         setAnswerRecords(prevRecords => [
             ...prevRecords,
             {
@@ -118,27 +120,51 @@ const Page = (props: Props) => {
             }
         ]);
 
-
-        // Lanjutkan ke pertanyaan berikutnya atau kirim data jika sudah selesai
         if (currentIndex < questions.length - 1) {
-            setShowTransition(false) // Mulai transisi fade-out
+            setShowTransition(false);
             setTimeout(() => {
-                setCurrentIndex(currentIndex + 1) // Pindah ke pertanyaan berikutnya
-                setSelectedValue(null) // Reset pilihan
-                setShowTransition(true) // Mulai transisi fade-in
-            }, 300)
+                setCurrentIndex(currentIndex + 1);
+                setSelectedValue(null);
+                setShowTransition(true);
+            }, 300);
         } else {
-            // Jika semua pertanyaan sudah dijawab, kirim data ke model
             const data = {
-                "answers": updatedAnswers // Gunakan updatedAnswers yang sudah final
-            }
-            uploadModel(data, (result: any) => {
+                answers: updatedAnswers
+            };
+
+            uploadModel(data, async (result: any) => {
                 console.log(result);
-                setConditionValue('end') // Tampilkan bagian hasil
-                setresultPrediction(result.predicted_major) // Set hasil prediksi
-            })
+                setConditionValue('end');
+                setresultPrediction(result.predicted_major);
+
+                const userId = localStorage.getItem('id');
+                if (!userId) return;
+
+                const userDocRef = doc(db, 'answer', userId);
+                const userDocSnap = await getDoc(userDocRef);
+
+                let existingAnswers: string[] = [];
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    existingAnswers = userData.answers || [];
+                }
+
+                // Tambahkan hasil baru ke array
+                const updatedPredictionArray = [...existingAnswers, result.predicted_major];
+
+                // Simpan kembali ke Firestore (replace dokumen userId)
+                await setDoc(userDocRef, {
+                    userId: userId,
+                    answers: updatedPredictionArray,
+                    createdAt: serverTimestamp()
+                });
+
+                console.log("Prediksi berhasil ditambahkan ke Firestore");
+            });
         }
-    }
+    };
+
 
     // Fungsi untuk memulai tes
     const startTes = () => {
