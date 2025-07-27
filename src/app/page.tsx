@@ -128,15 +128,37 @@ const Login = () => {
             <Image src={logo} alt="logo" width={150} height={170} />
           </div>
 
-          <InputForm placeholder='Masukkan Email' type='email' htmlFor={'email'} value={form.email} onChange={handleChange} />
+          <InputForm
+            placeholder='Masukkan Email'
+            type='email'
+            htmlFor='email'
+            value={form.email}
+            onChange={handleChange}
+          />
+          {errorMsg.email && <p className="text-red text-sm mt-1">{errorMsg.email}</p>}
+
           <div className="relative">
-            <button onClick={togglePassword} type='button' className='icon-password h-full  bg-transparent flex absolute right-0 justify-center items-center pe-4' > {showPassword ? <FaEyeSlash size={20} color='#636363' /> : <IoEye size={20} color='#636363' />} </button>
-            <InputForm className='form-input-login' htmlFor="password" onChange={handleChange} type={typePassword} value={form.password} placeholder="Masukkan Kata Sandi" />
+            <button
+              onClick={togglePassword}
+              type="button"
+              className="icon-password h-full bg-transparent flex absolute right-0 justify-center items-center pe-4"
+            >
+              {showPassword ? <FaEyeSlash size={20} color="#636363" /> : <IoEye size={20} color="#636363" />}
+            </button>
+            <InputForm
+              className="form-input-login"
+              htmlFor="password"
+              onChange={handleChange}
+              type={typePassword}
+              value={form.password}
+              placeholder="Masukkan Kata Sandi"
+            />
           </div>
-          <p className='text-red my-3 text-sm' >{errorLogin}</p>
+          {errorMsg.password && <p className="text-red text-sm my-1">{errorMsg.password}</p>}
           <ButtonPrimary typeButon={"submit"} className={`rounded-lg w-full mb-3 font-medium py-2 `}>
             {loading ? <Spinner className={`w-5 h-5 `} size="sm" color="white" /> : 'Login'}
           </ButtonPrimary>
+          {errorLogin && <p className="text-red text-sm my-1">{errorLogin}</p>}
           <p className='text-sm'>Belum punya akun ? <Link className='text-primary font-medium ' href={'/register'} > Daftar</Link></p>
         </form>
 

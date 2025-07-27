@@ -16,6 +16,9 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase/firebaseConfig';
+import ButtonPrimary from '@/components/elements/buttonPrimary';
+import { useRouter } from 'next/navigation';
+
 
 type Props = {}
 
@@ -408,12 +411,16 @@ const Page = (props: Props) => {
         fetchData();
     }, []);
 
-
+    const router = useRouter()
     const handleClickRespon = (value: string) => {
         setresultPrediction(value); // Update prediksi
         setConditionValue('end');   // Ganti tampilan ke hasil
     }
 
+    const handleLogout = () => {
+        localStorage.clear();
+        router.push('/');
+    }
 
     console.log('hahaha', majors);
 
@@ -434,7 +441,11 @@ const Page = (props: Props) => {
                     Lakukan tes minat bakat anda dengan berbagai pilihan pertanyaan
                 </h1>
                 <h2 className='mt-2' >Anda akan lebih tahu minat bakat serta kemampuan anda untuk masuk ke sekolah yadika</h2>
-                <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
+                <div className="flex gap-3">
+                    <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
+                    <ButtonPrimary className='py-1 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={handleLogout} >LOGOUT</ButtonPrimary>
+                </div>
+
             </section>
 
             <h1 className='text-lg font-semibold mt-10 mb-3' >Jawaban yang pernah anda test</h1>
@@ -451,6 +462,8 @@ const Page = (props: Props) => {
                     {conditions(conditionValue)}
                 </section>
             </div>
+
+
         </section>
 
     )
