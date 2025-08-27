@@ -123,6 +123,8 @@ const Page = (props: Props) => {
             }
         ]);
 
+        console.log('jawaban yang akan di masukan ke dalam firestore user answere :', updatedAnswers);
+
         if (currentIndex < questions.length - 1) {
             setShowTransition(false);
             setTimeout(() => {
@@ -152,6 +154,7 @@ const Page = (props: Props) => {
                     const userData = userDocSnap.data();
                     existingAnswers = userData.answers || [];
                 }
+
 
                 // Tambahkan hasil baru ke array
                 const updatedPredictionArray = [...existingAnswers, result.predicted_major];
