@@ -5,7 +5,6 @@ import 'swiper/css/pagination';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet/dist/images/marker-icon.png'
 import 'leaflet/dist/leaflet.css'
-import { ReduxProvider } from "@/redux/provider";
 import { interFont } from "@/utils/font";
 import { ProviderNextUI } from "@/lib/nextProvider";
 
@@ -26,16 +25,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ReduxProvider>
-      <html lang="en">
-        <body suppressHydrationWarning={true} >
-          <ProviderNextUI>
-            <div className={` ${interFont.className} dark:bg-boxdark-2 dark:text-bodydark`}>
-              {children}
-            </div>
-          </ProviderNextUI>
-        </body>
-      </html>
-    </ReduxProvider>
+
+    <html lang="en">
+      <body suppressHydrationWarning={true} >
+        <ProviderNextUI>
+          <div className={` ${interFont.className} dark:bg-boxdark-2 dark:text-bodydark`}>
+            {children}
+          </div>
+        </ProviderNextUI>
+      </body>
+    </html>
+
   );
 }

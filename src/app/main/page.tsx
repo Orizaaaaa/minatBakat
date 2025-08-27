@@ -9,7 +9,7 @@ import { FiUserCheck } from "react-icons/fi";
 import { HiOutlineDownload } from "react-icons/hi";
 import Image from 'next/image';
 import { akuntan, hotel, hotel2, logo, pplg } from '../image'; // Pastikan path import ini benar
-import { uploadModel } from '@/api/model'; // Pastikan path import ini benar
+import { uploadModel } from '@/lib/firebase/model'; // Pastikan path import ini benar
 
 // Import pustaka untuk PDF
 import jsPDF from 'jspdf';

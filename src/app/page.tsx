@@ -7,9 +7,7 @@ import InputForm from '@/components/elements/input/InputForm';
 import ButtonPrimary from '@/components/elements/buttonPrimary';
 import { FaEyeSlash } from 'react-icons/fa6';
 import { IoEye } from 'react-icons/io5';
-import { loginService } from '@/api/auth';
 import { Spinner } from '@nextui-org/react';
-
 import Link from 'next/link';
 import { logo } from './image';
 import { loginUser } from '@/lib/firebase/firestore';
@@ -109,16 +107,6 @@ const Login = () => {
 
 
 
-  // const handleRegister = async () => {
-  //     try {
-  //         const user = await registerUser("smpn@gmail.com", "oasis6666");
-  //         console.log("Registrasi berhasil", user);
-  //         // Lakukan sesuatu setelah registrasi berhasil, misal redirect ke halaman login atau profil
-  //     } catch (error) {
-  //         console.error(error);
-  //         // Tampilkan pesan error ke user
-  //     }
-  // };
 
   return (
     <div className="login">
