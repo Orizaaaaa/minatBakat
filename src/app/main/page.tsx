@@ -175,6 +175,7 @@ const Page = (props: Props) => {
     };
 
 
+
     // Fungsi untuk memulai tes
     const startTes = () => {
         setConditionValue('start') // Ubah kondisi ke 'start' untuk menampilkan pertanyaan
@@ -251,28 +252,26 @@ const Page = (props: Props) => {
 
     // Fungsi untuk mengunduh hasil ke PDF
     const handleDownloadPdf = async () => {
-        const doc = new jsPDF('p', 'mm', 'a4'); // Inisialisasi dokumen PDF (potrait, mm, A4)
-        let yOffset = 15; // Offset Y awal untuk konten
-        const margin = 10; // Margin kiri dan kanan
-        const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin; // Lebar maksimum untuk teks
+        const doc = new jsPDF('p', 'mm', 'a4');
+        let yOffset = 15;
+        const margin = 10;
+        const maxWidth = doc.internal.pageSize.getWidth() - 2 * margin;
 
         // Tambahkan Judul
         doc.setFontSize(15);
         doc.text('Laporan Hasil Tes Minat Bakat', doc.internal.pageSize.getWidth() / 2, yOffset, { align: 'center' });
         yOffset += 15;
 
-        // Tambahkan Hasil Prediksi (diambil dari elemen HTML)
+        // Tambahkan Hasil Prediksi
         if (resultContentRef.current) {
-            // Render elemen HTML ke canvas
-            const canvas = await html2canvas(resultContentRef.current, { scale: 2 }); // Skala 2 untuk kualitas lebih baik
-            const imgData = canvas.toDataURL('image/png'); // Dapatkan data gambar base64
-            const imgWidth = 180; // Lebar gambar di PDF (mm)
-            const imgHeight = (canvas.height * imgWidth) / canvas.width; // Hitung tinggi proporsional
+            const canvas = await html2canvas(resultContentRef.current, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 180;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            // Pusatkan gambar di halaman
             const imgX = (doc.internal.pageSize.getWidth() - imgWidth) / 2;
             doc.addImage(imgData, 'PNG', imgX, yOffset, imgWidth, imgHeight);
-            yOffset += imgHeight + 10; // Tambahkan offset setelah gambar
+            yOffset += imgHeight + 10;
         }
 
         // Tambahkan Judul Bagian Pertanyaan dan Jawaban
@@ -281,34 +280,27 @@ const Page = (props: Props) => {
         yOffset += 10;
 
         // Tambahkan setiap pertanyaan dan jawaban
-        doc.setFontSize(8); // Ukuran font untuk Q&A
+        doc.setFontSize(8);
         answerRecords.forEach((record, index) => {
-            // Format pertanyaan dengan nomor
             const questionText = `${index + 1}. ${record.question}`;
-            // Pecah teks pertanyaan agar sesuai dengan lebar halaman
             const splitQuestion = doc.splitTextToSize(questionText, maxWidth);
 
-            // Estimasi tinggi yang dibutuhkan untuk pertanyaan dan jawaban ini
             const questionHeight = splitQuestion.length * doc.getLineHeight() / doc.internal.scaleFactor;
-            const answerHeight = doc.getLineHeight() / doc.internal.scaleFactor; // Untuk 1 baris jawaban
-            const totalRecordHeight = questionHeight + answerHeight + 5; // Tambah spasi
+            const answerHeight = doc.getLineHeight() / doc.internal.scaleFactor;
+            const totalRecordHeight = questionHeight + answerHeight + 5;
 
-            // Periksa apakah perlu halaman baru
             if (yOffset + totalRecordHeight > doc.internal.pageSize.getHeight() - margin) {
-                doc.addPage(); // Tambah halaman baru
-                yOffset = margin; // Reset offset Y untuk halaman baru
+                doc.addPage();
+                yOffset = margin;
             }
 
-            // Tambahkan pertanyaan yang sudah dipecah
             doc.text(splitQuestion, margin, yOffset);
-            yOffset += questionHeight; // Pindahkan offset Y setelah pertanyaan
+            yOffset += questionHeight;
 
-            // Tambahkan jawaban
             doc.text(`   Jawaban Anda: ${record.answerLabel} (${record.answerValue})`, margin + 5, yOffset);
-            yOffset += answerHeight + 5; // Spasi setelah jawaban dan untuk record berikutnya
+            yOffset += answerHeight + 5;
         });
 
-        // Simpan dokumen PDF
         doc.save('hasil_tes_minat_bakat.pdf');
     };
 
@@ -414,10 +406,36 @@ const Page = (props: Props) => {
 
         if (userDocSnap.exists()) {
             const data = userDocSnap.data();
-            // data answere di sini, nanti di masukan ke resul
             const answers = data.answers || [];
-            console.log(answers);
+            console.log(answers); // Simpan hasil dari API
             setResultQuestion(data.result);
+
+            // Buat array untuk records pertanyaan dan jawaban
+            const records = answers.map((answerValue: any, index: any) => {
+                // Dapatkan pertanyaan berdasarkan index dari API
+                const question = questions[index] || `Pertanyaan ${index + 1}`;
+
+                // Konversi nilai jawaban ke label (sesuaikan dengan kebutuhan Anda)
+                let answerLabel = '';
+                switch (answerValue) {
+                    case 1: answerLabel = 'Sangat Tidak Setuju'; break;
+                    case 2: answerLabel = 'Tidak Setuju'; break;
+                    case 3: answerLabel = 'Netral'; break;
+                    case 4: answerLabel = 'Setuju'; break;
+                    case 5: answerLabel = 'Sangat Setuju'; break;
+                    default: answerLabel = 'Tidak dijawab';
+                }
+
+                return {
+                    question,
+                    answerValue,
+                    answerLabel
+                };
+            });
+            setresultPrediction(data.result);
+            setAnswerRecords(records);
+            setConditionValue('end');
+
         }
     };
 
@@ -437,6 +455,7 @@ const Page = (props: Props) => {
     }
 
     console.log(answerRecords);
+    console.log('taik', resultQuestion);
 
 
 
