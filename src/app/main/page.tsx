@@ -18,6 +18,7 @@ import { addDoc, collection, doc, getDoc, serverTimestamp, setDoc } from 'fireba
 import { db } from '@/lib/firebase/firebaseConfig';
 import ButtonPrimary from '@/components/elements/buttonPrimary';
 import { useRouter } from 'next/navigation';
+import { Spinner } from '@nextui-org/react';
 
 
 type Props = {}
@@ -77,12 +78,13 @@ const options = [
 
 // Interface untuk menyimpan detail jawaban
 interface AnswerRecord {
-    question: string;
+    question: any;
     answerValue: number;
     answerLabel: string;
 }
 
 const Page = (props: Props) => {
+    const [loading, setLoading] = useState(false)
     // State untuk melacak indeks pertanyaan saat ini
     const [currentIndex, setCurrentIndex] = useState(0)
     // State untuk menyimpan nilai jawaban (angka 1-5) yang akan dikirim ke model
@@ -133,6 +135,7 @@ const Page = (props: Props) => {
                 setShowTransition(true);
             }, 300);
         } else {
+            setLoading(true);
             const data = {
                 answers: updatedAnswers
             };
@@ -156,16 +159,16 @@ const Page = (props: Props) => {
                 }
 
 
-                // Tambahkan hasil baru ke array
-                const updatedPredictionArray = [...existingAnswers, result.predicted_major];
-
                 // Simpan kembali ke Firestore (replace dokumen userId)
                 await setDoc(userDocRef, {
                     userId: userId,
-                    answers: updatedPredictionArray,
+                    result: result.predicted_major,
+                    answers: updatedAnswers,
                     createdAt: serverTimestamp()
                 });
 
+                fetchData();
+                setLoading(false)
                 console.log("Prediksi berhasil ditambahkan ke Firestore");
             });
         }
@@ -310,7 +313,6 @@ const Page = (props: Props) => {
     };
 
 
-
     // Fungsi untuk mengontrol tampilan berdasarkan kondisi
     const conditions = (value: string) => {
         if (value === 'pending') {
@@ -367,7 +369,13 @@ const Page = (props: Props) => {
                                 onClick={handleAnswer}
                                 className="py-2 px-4 rounded-full bg-black text-white text-sm mt-7 flex items-center gap-2"
                             >
-                                KIRIM JAWABAN <PiPaperPlaneRightLight size={20} />
+                                {loading ? <Spinner size="sm" color='white' /> :
+                                    <>
+                                        KIRIM JAWABAN
+                                        <PiPaperPlaneRightLight size={20} />
+                                    </>
+                                }
+
                             </button>
                         </div>
                     </div>
@@ -395,7 +403,7 @@ const Page = (props: Props) => {
         }
     }
 
-    const [majors, setMajors] = useState<string[]>([]);
+    const [resultQuestion, setResultQuestion] = useState('');
 
     const fetchData = async () => {
         const userId = localStorage.getItem('id');
@@ -406,7 +414,10 @@ const Page = (props: Props) => {
 
         if (userDocSnap.exists()) {
             const data = userDocSnap.data();
-            setMajors(data.answers || []);
+            // data answere di sini, nanti di masukan ke resul
+            const answers = data.answers || [];
+            console.log(answers);
+            setResultQuestion(data.result);
         }
     };
 
@@ -425,7 +436,8 @@ const Page = (props: Props) => {
         router.push('/');
     }
 
-    console.log('hahaha', majors);
+    console.log(answerRecords);
+
 
 
     return (
@@ -451,15 +463,21 @@ const Page = (props: Props) => {
 
             </section>
 
-            <h1 className='text-lg font-semibold mt-10 mb-3' >Jawaban yang pernah anda test</h1>
+            {resultQuestion && (
+                <>
+                    <h1 className='text-lg font-semibold mt-10 mb-3' >Jawaban yang pernah anda test</h1>
 
-            <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
-                {majors.map((major, index) => (
-                    <button key={index} onClick={() => handleClickRespon(major)} className="bg-black text-white px-3 py-2 rounded-xl">
-                        {major}
-                    </button>
-                ))}
-            </div>
+                    <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+
+                        <button onClick={() => handleClickRespon(resultQuestion)} className="bg-black text-white px-3 py-2 rounded-xl">
+                            {resultQuestion}
+                        </button>
+
+                    </div>
+                </>
+
+            )}
+
             <div className=" px-2 lg:px-8 h-screen overflow-y-auto" ref={tesSectionRef}>
                 <section className='w-full h-fit lg:h-[500px] mt-10 rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] shadow-black/25 p-4 overflow-y-auto'>
                     {conditions(conditionValue)}
