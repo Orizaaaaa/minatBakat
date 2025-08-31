@@ -455,8 +455,6 @@ const Page = (props: Props) => {
     }
 
     console.log(answerRecords);
-    console.log('taik', resultQuestion);
-
 
 
     return (
@@ -465,7 +463,7 @@ const Page = (props: Props) => {
                 <div className="flex justify-center items-center gap-2">
                     <Image src={logo} alt="logo" width={170} height={170} />
                 </div>
-                <button onClick={startTes} className='py-2 px-4 rounded-full bg-black text-white text-sm lg:text-base' > TES MINAT GRATIS</button>
+                <div className='py-2 px-4 rounded-full bg-black text-white text-sm lg:text-base' > TES MINAT GRATIS</div>
             </div>
 
             <hr className=' mb-10 mt-5 text-slate-200' />
@@ -476,7 +474,9 @@ const Page = (props: Props) => {
                 </h1>
                 <h2 className='mt-2' >Anda akan lebih tahu minat bakat serta kemampuan anda untuk masuk ke sekolah yadika</h2>
                 <div className="flex gap-3">
-                    <button className='py-2 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={startTes} > LAKUKAN TES</button>
+                    {conditionValue !== 'end' && (
+                        <button className={`py-2 px-4 rounded-full bg-black text-white text-sm mt-7`} onClick={startTes} > LAKUKAN TES</button>
+                    )}
                     <ButtonPrimary className='py-1 px-4 rounded-full bg-black text-white text-sm mt-7' onClick={handleLogout} >LOGOUT</ButtonPrimary>
                 </div>
 
