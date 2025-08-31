@@ -87,7 +87,7 @@ const Register = () => {
             setForm(prev => ({ ...prev, [name]: value }))
             setErrorMsg(prev => ({
                 ...prev,
-                name: value.length < 6 ? '*Password minimal 6 karakter' : ''
+                name: value.length < 1 ? '*Nama tidak boleh kosong' : ''
             }))
             return
         }
@@ -141,7 +141,7 @@ const Register = () => {
                         value={form.name}
                         onChange={handleChange}
                     />
-                    <p className="text-red text-sm mb-2">{errorMsg.nik}</p>
+                    <p className="text-red text-sm mb-2">{errorMsg.name}</p>
                     <InputForm
                         placeholder='Masukkan NIK'
                         type='text'
