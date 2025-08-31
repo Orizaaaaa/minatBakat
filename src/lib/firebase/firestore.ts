@@ -15,7 +15,7 @@ export const loginUser = async (email: string, password: string): Promise<any> =
     }
 };
 
-export const registerUser = async (email: string, password: string, name: string): Promise<any> => {
+export const registerUser = async (email: string, password: string, name: string, nik: string): Promise<any> => {
     try {
         // Registrasi user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -25,6 +25,7 @@ export const registerUser = async (email: string, password: string, name: string
         await setDoc(doc(db, "users", user.uid), {
             uid: user.uid,
             email: user.email,
+            nik: nik,
             name: name, // ← tambahkan name di sini
             createdAt: serverTimestamp(),
             role: 'user'

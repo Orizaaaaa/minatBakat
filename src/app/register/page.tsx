@@ -111,7 +111,7 @@ const Register = () => {
         }
 
         try {
-            const user = await registerUser(form.email, form.password, form.name) // ← kirim name ke sini
+            const user = await registerUser(form.email, form.password, form.name, form.nik) // ← kirim name ke sini
             console.log("Registrasi berhasil", user)
             setErrorRegister('')
             router.push('/')
