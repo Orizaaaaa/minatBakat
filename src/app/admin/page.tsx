@@ -57,7 +57,7 @@ const Page = () => {
     return (
         <section>
             <div className="main container mx-auto">
-                <h1 className="text-2xl mt-3">Statistik Error</h1>
+                <h1 className="text-2xl mt-3 italic">STATISTIK ERROR MODEL</h1>
 
                 <div className="table-login mt-4">
                     <Table aria-label="Daftar Error Model"
