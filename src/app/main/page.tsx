@@ -106,7 +106,7 @@ const Page = (props: Props) => {
     const resultContentRef = useRef<HTMLDivElement>(null);
 
     // Fungsi untuk menangani jawaban pengguna
-    const handleAnswer = () => {
+    const handleAnswer = async () => {
         if (selectedValue === null) return;
 
         const updatedAnswers = [...answers];
@@ -140,7 +140,13 @@ const Page = (props: Props) => {
                 answers: updatedAnswers
             };
 
-            uploadModel(data, async (result: any) => {
+            try {
+                const result = await uploadModel(data);
+
+                if (!result || !result.predicted_major) {
+                    throw new Error("Model tidak memberikan jawaban");
+                }
+
                 console.log(result);
                 setConditionValue('end');
                 setresultPrediction(result.predicted_major);
@@ -152,14 +158,11 @@ const Page = (props: Props) => {
                 const userDocSnap = await getDoc(userDocRef);
 
                 let existingAnswers: string[] = [];
-
                 if (userDocSnap.exists()) {
                     const userData = userDocSnap.data();
                     existingAnswers = userData.answers || [];
                 }
 
-
-                // Simpan kembali ke Firestore (replace dokumen userId)
                 await setDoc(userDocRef, {
                     userId: userId,
                     result: result.predicted_major,
@@ -168,9 +171,21 @@ const Page = (props: Props) => {
                 });
 
                 fetchData();
-                setLoading(false)
+                setLoading(false);
                 console.log("Prediksi berhasil ditambahkan ke Firestore");
-            });
+
+            } catch {
+                console.error("Terjadi error saat memanggil model");
+
+                const userName = localStorage.getItem("name") || "Unknown User";
+                await addDoc(collection(db, "model_errors"), {
+                    name: userName,
+                    error: "Terjadi error pada model",
+                    createdAt: serverTimestamp(),
+                });
+
+                setLoading(false);
+            }
         }
     };
 
