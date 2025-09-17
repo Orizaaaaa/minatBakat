@@ -13,9 +13,8 @@ type ErrorRecord = {
 }
 
 // fungsi format tanggal
-const formatDate = (timestamp?: { seconds: number; nanoseconds: number }) => {
-    if (!timestamp) return "-";
-    const date = new Date(timestamp.seconds * 1000);
+const formatDate = (date?: Date | null) => {
+    if (!date) return "-";
     return date.toLocaleString("id-ID", {
         day: "2-digit",
         month: "2-digit",
@@ -30,17 +29,26 @@ const Page = () => {
 
     const fetchErrors = async () => {
         try {
-            const q = query(collection(db, "model_errors"), orderBy("createdAt", "desc"))
-            const querySnapshot = await getDocs(q)
-            const data: ErrorRecord[] = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as ErrorRecord[]
-            setErrorRecords(data)
+            const q = query(collection(db, "model_errors"), orderBy("createdAt", "desc"));
+            const querySnapshot = await getDocs(q);
+
+            const data: ErrorRecord[] = querySnapshot.docs.map(doc => {
+                const d = doc.data();
+                return {
+                    id: doc.id,
+                    name: d.name,
+                    error: d.error,
+                    createdAt: d.createdAt?.toDate ? d.createdAt.toDate() : null, // ubah ke Date
+                };
+            }) as ErrorRecord[];
+
+            console.log(data);
+            setErrorRecords(data);
         } catch (err) {
-            console.error("Gagal fetch error:", err)
+            console.error("Gagal fetch error:", err);
         }
-    }
+    };
+
 
     useEffect(() => {
         fetchErrors()
@@ -62,7 +70,7 @@ const Page = () => {
                         </TableHeader>
                         <TableBody
                             emptyContent={"Belum ada error yang ditemukan"}>
-                            {errorRecords.map((record) => (
+                            {errorRecords.map((record: any) => (
                                 <TableRow key={record.id}>
                                     <TableCell>{record.name}</TableCell>
                                     <TableCell>{formatDate(record.createdAt)}</TableCell>
