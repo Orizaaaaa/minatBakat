@@ -464,6 +464,7 @@ const Page = (props: Props) => {
         setConditionValue('end');   // Ganti tampilan ke hasil
     }
 
+
     const handleLogout = () => {
         localStorage.clear();
         router.push('/');

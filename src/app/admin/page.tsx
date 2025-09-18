@@ -2,6 +2,7 @@
 import { db } from '@/lib/firebase/firebaseConfig'
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
 import { collection, getDocs, query, orderBy } from "firebase/firestore"
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react"
 
 // tipe data
@@ -49,17 +50,24 @@ const Page = () => {
         }
     };
 
+    const router = useRouter()
+    const handleLogout = () => {
+        localStorage.clear();
+        router.push('/');
+    }
 
     useEffect(() => {
         fetchErrors()
     }, [])
+
+
 
     return (
         <section>
             <div className="main container mx-auto">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl mt-3 italic">STATISTIK ERROR MODEL</h1>
-                    <button className="py-2 px-6 rounded-full bg-black text-white text-sm flex items-center gap-2" >Logout</button>
+                    <button onClick={handleLogout} className="py-2 px-6 rounded-full bg-black text-white text-sm flex items-center gap-2" >Logout</button>
                 </div>
 
 
