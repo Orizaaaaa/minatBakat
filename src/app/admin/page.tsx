@@ -66,7 +66,7 @@ const Page = () => {
         <section>
             <div className="main container mx-auto">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-2xl mt-3 italic">STATISTIK ERROR MODEL</h1>
+                    <h1 className="text-2xl mt-3 italic">DAFTAR ERROR MODEL</h1>
                     <button onClick={handleLogout} className="py-2 px-6 rounded-full bg-black text-white text-sm flex items-center gap-2" >Logout</button>
                 </div>
 
