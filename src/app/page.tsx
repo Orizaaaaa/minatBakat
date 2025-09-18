@@ -83,21 +83,43 @@ const Login = () => {
       const userSnapshot = await getDoc(userDocRef);
 
       let name = '';
+      let role = ''; // ← Tambahkan variabel untuk role
+      let email = user.email || '';
+
       if (userSnapshot.exists()) {
         const userData = userSnapshot.data();
         name = userData.name || '';
+        role = userData.role || 'user'; // ← Ambil role dari Firestore
       }
 
       // Simpan ke localStorage
-      document.cookie = `token=${token}; path=/`;
+      document.cookie = `token=${token}; path=/; max-age=86400`; // 1 hari
+      document.cookie = `role=${role}; path=/; max-age=86400`;
+      document.cookie = `email=${encodeURIComponent(email)}; path=/; max-age=86400`;
       localStorage.setItem('token', token);
-      localStorage.setItem('email', user.email || '');
-      localStorage.setItem('id', uid || '');
-      localStorage.setItem('name', name); // ← Simpan nama dari Firestore
+      localStorage.setItem('email', email);
+      localStorage.setItem('id', uid);
+      localStorage.setItem('name', name);
+      localStorage.setItem('role', role); // ← Simpan role ke localStorage
+
+      // Tampilkan data user di console (untuk debugging)
+      console.log('User Data:', {
+        uid,
+        email,
+        name,
+        role,
+        token
+      });
 
       setErrorLogin('');
       setLoading(false);
-      router.push('/main');
+
+      // Redirect berdasarkan role
+      if (role === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/main');
+      }
     } catch (error) {
       setErrorLogin('*Email atau password salah');
       console.error(error);
