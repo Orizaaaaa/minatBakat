@@ -57,7 +57,11 @@ const Page = () => {
     return (
         <section>
             <div className="main container mx-auto">
-                <h1 className="text-2xl mt-3 italic">STATISTIK ERROR MODEL</h1>
+                <div className="flex justify-between items-center">
+                    <h1 className="text-2xl mt-3 italic">STATISTIK ERROR MODEL</h1>
+                    <button className="py-2 px-6 rounded-full bg-black text-white text-sm flex items-center gap-2" >Logout</button>
+                </div>
+
 
                 <div className="table-login mt-4">
                     <Table aria-label="Daftar Error Model"
