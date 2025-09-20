@@ -1,9 +1,11 @@
 'use client'
 import { db } from '@/lib/firebase/firebaseConfig'
+import { uploadModel } from '@/lib/firebase/model'
 import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react'
-import { collection, getDocs, query, orderBy } from "firebase/firestore"
+import { collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "firebase/firestore"
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from "react"
+import toast from 'react-hot-toast'
 
 // tipe data
 type ErrorRecord = {
@@ -60,6 +62,29 @@ const Page = () => {
         fetchErrors()
     }, [])
 
+    const handleTestError = async () => {
+        const toastId = toast.loading("Mencoba mengirim data error");
+
+        // jawaban yang di salahkan ,harus nya model menerima 40 jawaban
+        const arrayAnswer = [1, 3, 4, 5, 2, 4, 2, 1, 3, 4]
+        try {
+            // mengirim jawaban ke model
+            const result = await uploadModel(arrayAnswer);
+            if (!result) {
+                throw new Error("Model tidak memberikan jawaban");
+            }
+        } catch (error) {
+            // jika error akan memasukan error nya ke dalam database
+            const userName = localStorage.getItem("name") || "Unknown User";
+            await addDoc(collection(db, "model_errors"), {
+                name: userName,
+                error: "Terjadi error pada model",
+                createdAt: serverTimestamp(),
+            });
+            fetchErrors()
+            toast.success("Jawaban yang salah berhasil dikirim ", { id: toastId })
+        }
+    }
 
 
     return (
@@ -76,8 +101,8 @@ const Page = () => {
 
                     >
                         <TableHeader >
-                            <TableColumn>NAMA</TableColumn>
-                            <TableColumn>TANGGAL</TableColumn>
+                            <TableColumn>NAMA PENGGUNA</TableColumn>
+                            <TableColumn>TANGGAL ERROR</TableColumn>
                             <TableColumn>KESALAHAN</TableColumn>
                         </TableHeader>
                         <TableBody
@@ -91,6 +116,9 @@ const Page = () => {
                             ))}
                         </TableBody>
                     </Table>
+                </div>
+                <div className="mt-5">
+                    <button className='px-4 py-2 bg-red text-white rounded-full' onClick={() => handleTestError()} >Test Error</button>
                 </div>
             </div>
         </section>

@@ -7,6 +7,7 @@ import 'leaflet/dist/images/marker-icon.png'
 import 'leaflet/dist/leaflet.css'
 import { interFont } from "@/utils/font";
 import { ProviderNextUI } from "@/lib/nextProvider";
+import { Toaster } from "react-hot-toast";
 
 
 
@@ -29,6 +30,8 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning={true} >
         <ProviderNextUI>
+          <Toaster position="top-center"
+            reverseOrder={false} />
           <div className={` ${interFont.className} dark:bg-boxdark-2 dark:text-bodydark`}>
             {children}
           </div>
